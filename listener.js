@@ -30,7 +30,7 @@ module.exports = (symbols = [], onMessage) => {
     });
 
     client.on('close', (message) => {
-      log.info('Connection was closed');
+      console.log('Connection was closed');
       clearInterval(sendPongInterval);
       websocketConnect();
     });
