@@ -9,7 +9,6 @@ const LONG_MA_PERIOD = 200;
 const MEDIUM_MA_PERIOD = 50;
 
 const checkMACrossing = async () => {
-  // const targetInstruments = ['XTZUSDT'];
   const targetInstruments = JSON.parse(await redis.get(INSTRUMENTS_KEY));
 
   await Promise.all(targetInstruments.map(async (symbol) => {
@@ -18,14 +17,14 @@ const checkMACrossing = async () => {
     const longMAResults = calculateData(candles, LONG_MA_PERIOD);
     const mediumMAResults = calculateData(candles, MEDIUM_MA_PERIOD);
 
-    const prevMediumMA = mediumMAResults.at(-4);
-    const currentMediumMA = mediumMAResults.at(-1);
+    const { value: prevMediumMA} = mediumMAResults.at(-5);
+    const { value: currentMediumMA} = mediumMAResults.at(-1);
 
-    const prevLongMA = longMAResults.at(-4);
-    const currentLongMA = longMAResults.at(-1);
+    const { value: prevLongMA} = longMAResults.at(-5);
+    const { value: currentLongMA} = longMAResults.at(-1);
 
     if ((prevMediumMA > prevLongMA && currentMediumMA < currentLongMA)
-      || (prevMediumMA < prevLongMA && currentLongMA > currentMediumMA)) {
+      || (prevMediumMA < prevLongMA && currentMediumMA > currentLongMA)) {
       const lastNotificationKey = `${key}:MA_CROSSING:LAST_NOTIFICATION`;
       const lastNotification = await redis.get(lastNotificationKey);
 
@@ -42,7 +41,7 @@ const checkMACrossing = async () => {
     }
   }));
 
-  console.log('Finished');
+  // console.log('Finished');
 };
 
 const calculateData = (inputData, period) => {
